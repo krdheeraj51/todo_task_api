@@ -259,46 +259,35 @@ const deleteSubTasks = (req, res) => {
 };
 
 let getAllTasks = (req, res) => {
-  var updateTasksArray = [];
-  let newTaskObj = {};
   let apiResponse;
-  taskModel.find().exec((err, taskInfo) => {
-    if (err) {
-      apiResponse = response.generate(
-        true,
-        "Task is not Listed here",
-        500,
-        null
-      );
-      res.send(apiResponse);
-    } else {
-      for (let task of taskInfo) {
-        subTaskModel.find({ taskId: task.id }).exec((err, subTaskInfo) => {
-          if (err) {
-            console.log("Something is missing");
-          }
-          newTaskObj = {
-            task_id: task._id,
-            title: task.title,
-            description: task.description,
-            status: task.status,
-            timestamps: task.timestamps,
-            sub_tasks: subTaskInfo,
-          };
-          updateTasksArray.push(newTaskObj);
-        });
-      }
-      apiResponse = response.generate(
-        false,
-        "All Tasks are listed.",
-        200,
-        taskInfo
-      );
-      res.send(apiResponse);
-    }
-  });
-};
+  let taskIds = [];
 
+  taskModel
+    .find()
+    .then((taskInfo) => {
+      taskInfo.map((d, k) => {
+        taskIds.push(d._id);
+      });
+      subTaskModel
+        .find({ taskId: { $in: taskIds } })
+        .then((subTaskInfo) => {
+          apiResponse = response.generate(
+            false,
+            "All Tasks and sub tasks are listed.",
+            200,
+            {taskInfo,subTaskInfo}
+          );
+          res.send(apiResponse);
+        })
+        .catch((error) => {
+          console.log("something is going wrong");
+        });
+    })
+    .catch((err) => {
+      apiResponse = response.generate(true, "Error occured", 500, null);
+      res.send(apiResponse);
+    });
+}
 module.exports = {
   createUser,
   createTask,
