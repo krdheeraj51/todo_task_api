@@ -221,7 +221,6 @@ const deleteTask = (req, res) => {
 
 const deleteSubTasks = (req, res) => {
   if (req.body.user_type === 1) {
-    if (req.body.user_type === 1) {
       const id = req.params.sub_taskId;
       subTaskModel.findByIdAndDelete(id, (err, dataInfo) => {
         if (err) {
@@ -233,7 +232,6 @@ const deleteSubTasks = (req, res) => {
           );
           res.send("Something is missing");
         } else {
-          console.log("dataInfo ::", dataInfo);
           let apiResponse = response.generate(
             false,
             "Sub Task has been deleted Successfully",
@@ -243,7 +241,6 @@ const deleteSubTasks = (req, res) => {
           res.send(apiResponse);
         }
       });
-    }
   } else {
     let apiResponse = response.generate(
       true,
@@ -255,35 +252,29 @@ const deleteSubTasks = (req, res) => {
   }
 };
 
-let getAllTasks = (req, res) => {
-  let apiResponse;
-  let taskIds = [];
-
-  taskModel
-    .find()
-    .then((taskInfo) => {
-      taskInfo.map((d, k) => {
-        taskIds.push(d._id);
-      });
-      subTaskModel
-        .find({ taskId: { $in: taskIds } })
-        .then((subTaskInfo) => {
-          apiResponse = response.generate(
-            false,
-            "All Tasks and sub tasks are listed.",
-            200,
-            { taskInfo, subTaskInfo }
-          );
-          res.send(apiResponse);
-        })
-        .catch((error) => {
-          console.log("something is going wrong");
-        });
-    })
-    .catch((err) => {
-      apiResponse = response.generate(true, "Error occured", 500, null);
-      res.send(apiResponse);
-    });
+let getAllTasks = async (req, res) => {
+  try {
+    let task_subTask = await taskModel.aggregate([
+      {
+        $lookup: {
+          from: "sub_task",
+          localField: "id",
+          foreignField: "taskId",
+          as: "sub_tasks",
+        },
+      },
+    ]);
+    let apiResponse = response.generate(
+      false,
+      "All Tasks and sub tasks are listed.",
+      200,
+      task_subTask
+    );
+    res.send(apiResponse);
+  } catch (err) {
+    let apiResponse = response.generate(true, "Error occured", 500, null);
+    res.send(apiResponse);
+  }
 };
 module.exports = {
   createUser,
