@@ -1,4 +1,4 @@
-#### Execurte command : 
+#### Execute command : 
 node index.js
 #### API base URL :  
 /api/V1/todoTask
