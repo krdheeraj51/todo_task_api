@@ -108,30 +108,34 @@ let createSubTask = (req, res) => {
 const updateTaks = (req, res) => {
   if (req.body.user_type === 1) {
     let dataObj = req.body;
-    const id = req.params.taskId;
+    const { taskId } = req.params;
     let update_data = {};
     if (dataObj.title) update_data.title = dataObj.title;
     if (dataObj.description) update_data.description = dataObj.description;
     if (dataObj.status) update_data.status = dataObj.status;
-    taskModel.findByIdAndUpdate(id, update_data, function (err, updatedTask) {
-      if (err) {
-        let apiResponse = response.generate(
-          true,
-          "Failed to update Task Details",
-          500,
-          null
-        );
-        res.send("Something is missing");
-      } else {
-        let apiResponse = response.generate(
-          false,
-          "Task has been updated Successfully",
-          200,
-          update_data
-        );
-        res.send(apiResponse);
+    taskModel.findOneAndUpdate(
+      { id: taskId },
+      update_data,
+      function (err, updatedTask) {
+        if (err) {
+          let apiResponse = response.generate(
+            true,
+            "Failed to update Task Details",
+            500,
+            null
+          );
+          res.send("Something is missing");
+        } else {
+          let apiResponse = response.generate(
+            false,
+            "Task has been updated Successfully",
+            200,
+            update_data
+          );
+          res.send(apiResponse);
+        }
       }
-    });
+    );
   } else {
     let apiResponse = response.generate(
       true,
@@ -146,12 +150,12 @@ const updateTaks = (req, res) => {
 const updateSubTasks = (req, res) => {
   if (req.body.user_type === 1) {
     let dataObj = req.body;
-    const id = req.params.sub_taskId;
+    const { sub_taskId } = req.params;
     let update_data = {};
     if (dataObj.title) update_data.title = dataObj.title;
     if (dataObj.status) update_data.status = dataObj.status;
-    subTaskModel.findByIdAndUpdate(
-      id,
+    subTaskModel.findOneAndUpdate(
+      { id: sub_taskId },
       update_data,
       function (err, updatedTask) {
         if (err) {
@@ -186,8 +190,9 @@ const updateSubTasks = (req, res) => {
 
 const deleteTask = (req, res) => {
   if (req.body.user_type === 1) {
-    const id = req.params.taskId;
-    taskModel.findByIdAndDelete(id, (err, dataInfo) => {
+    const { taskId } = req.params;
+    taskModel.findOneAndDelete({ id: taskId }, (err, dataInfo) => {
+      console.log("dataInfo ::", dataInfo);
       if (err) {
         let apiResponse = response.generate(
           true,
@@ -198,7 +203,7 @@ const deleteTask = (req, res) => {
         res.send("Something is missing");
       } else {
         console.log("dataInfo ::", dataInfo);
-        subTaskModel.find({ taskId: id }).deleteMany().exec();
+        subTaskModel.find({ taskId: taskId }).deleteMany().exec();
         let apiResponse = response.generate(
           false,
           "Task has been deleted Successfully",
@@ -221,26 +226,26 @@ const deleteTask = (req, res) => {
 
 const deleteSubTasks = (req, res) => {
   if (req.body.user_type === 1) {
-      const id = req.params.sub_taskId;
-      subTaskModel.findByIdAndDelete(id, (err, dataInfo) => {
-        if (err) {
-          let apiResponse = response.generate(
-            true,
-            "Failed to delete Sub Task Details",
-            500,
-            null
-          );
-          res.send("Something is missing");
-        } else {
-          let apiResponse = response.generate(
-            false,
-            "Sub Task has been deleted Successfully",
-            200,
-            dataInfo
-          );
-          res.send(apiResponse);
-        }
-      });
+    const { sub_taskId } = req.params;
+    subTaskModel.findOneAndDelete({ id: sub_taskId }, (err, dataInfo) => {
+      if (err) {
+        let apiResponse = response.generate(
+          true,
+          "Failed to delete Sub Task Details",
+          500,
+          null
+        );
+        res.send("Something is missing");
+      } else {
+        let apiResponse = response.generate(
+          false,
+          "Sub Task has been deleted Successfully",
+          200,
+          dataInfo
+        );
+        res.send(apiResponse);
+      }
+    });
   } else {
     let apiResponse = response.generate(
       true,

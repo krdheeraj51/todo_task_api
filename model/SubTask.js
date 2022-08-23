@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 const shortid = require("shortid");
 const subTaskSchema = new Schema(
   {
+    id: {
+      type: String,
+      default: shortid.generate,
+    },
     title: {
       type: String,
     },
