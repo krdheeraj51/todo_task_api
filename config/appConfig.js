@@ -1,14 +1,16 @@
+require("dotenv").config();
+
 let appConfig={};
 
-appConfig.port=3000;
+appConfig.port=process.env.API_PORT;
 appConfig.allowedCorsOrigin="*";
-appConfig.env="dev";
+appConfig.env=process.env.ENVIRONMENT;
 appConfig.db={
-    uri:'mongodb://127.0.0.1:27017/todoApp'
+    uri:process.env.dbURI
 };
 
 
-appConfig.apiVersion='/api/V1';
+appConfig.apiVersion=process.env.API_VERSION;
 
 module.exports={
     port:appConfig.port,
