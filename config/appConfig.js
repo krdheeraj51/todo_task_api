@@ -6,7 +6,7 @@ appConfig.port=process.env.API_PORT;
 appConfig.allowedCorsOrigin="*";
 appConfig.env=process.env.ENVIRONMENT;
 appConfig.db={
-    uri:process.env.dbURI
+    uri:process.env.DBURI
 };
 
 

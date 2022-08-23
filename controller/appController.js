@@ -5,9 +5,6 @@ const mongoose = require("mongoose");
 const userModel = mongoose.model("users");
 const taskModel = mongoose.model("tasks");
 const subTaskModel = mongoose.model("sub_tasks");
-let sayHello = (req, res) => {
-  res.send("Hello Test APP");
-};
 let createUser = (req, res) => {
   let createNewUser = new userModel({
     name: req.body.name,
@@ -275,7 +272,7 @@ let getAllTasks = (req, res) => {
             false,
             "All Tasks and sub tasks are listed.",
             200,
-            {taskInfo,subTaskInfo}
+            { taskInfo, subTaskInfo }
           );
           res.send(apiResponse);
         })
@@ -287,7 +284,7 @@ let getAllTasks = (req, res) => {
       apiResponse = response.generate(true, "Error occured", 500, null);
       res.send(apiResponse);
     });
-}
+};
 module.exports = {
   createUser,
   createTask,
@@ -297,5 +294,4 @@ module.exports = {
   updateSubTasks,
   deleteTask,
   deleteSubTasks,
-  sayHello,
 };
